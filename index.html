@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Slots! - Verified v5.1</title> <!-- Updated Title -->
+    <style>
+        /* --- Font Import --- */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        /* --- CSS Variables --- */
+        :root {
+            /* Pokedex Theme */
+            --pokedex-red-dark: #a13a1a;
+            --pokedex-red-light: #d15a2b;
+            --pokedex-border: #601c0c;
+            --pokedex-screen-bg: #282828;
+            --pokedex-screen-text: #9bbc0f; /* Gameboy green */
+            --pokedex-button-blue: #367ab8;
+            --pokedex-button-yellow: #ffcb05;
+            --pokedex-button-green: #4CAF50;
+            --pokedex-button-red: #d9534f;
+            --pokedex-light-grey: #ddd;
+            --pokedex-dark-grey: #404040;
+            --pokedex-black: #111;
+
+            /* Functional Colors */
+            --machine-bg: linear-gradient(145deg, var(--pokedex-red-light), var(--pokedex-red-dark));
+            --machine-border: var(--pokedex-border);
+            --display-bg: var(--pokedex-screen-bg);
+            --display-text: var(--pokedex-screen-text);
+            --reel-bg: #f5f5f5;
+            --reel-border: #999;
+            --cell-border: #ccc;
+            --control-panel-bg: var(--pokedex-dark-grey);
+            --button-green-bg: linear-gradient(to bottom, #70e070, var(--pokedex-button-green));
+            --button-green-hover-bg: linear-gradient(to bottom, #80f080, #5cb85c);
+            --button-green-active-bg: linear-gradient(to bottom, #5cb85c, #449d44);
+            --button-blue-bg: linear-gradient(to bottom, #5c9dde, var(--pokedex-button-blue));
+            --button-blue-hover-bg: linear-gradient(to bottom, #6caeee, #4087c9);
+            --button-blue-active-bg: linear-gradient(to bottom, #4087c9, #2a6091);
+            --button-red-bg: linear-gradient(to bottom, #e67c79, var(--pokedex-button-red));
+            --button-red-hover-bg: linear-gradient(to bottom, #f19592, #d9534f);
+            --button-red-active-bg: linear-gradient(to bottom, #d9534f, #c9302c);
+            --button-orange-bg: linear-gradient(to bottom, #f0c47e, #f0ad4e);
+            --button-orange-hover-bg: linear-gradient(to bottom, #f5d49c, #eea236);
+            --button-orange-active-bg: linear-gradient(to bottom, #eea236, #ec9a24);
+            --button-grey-bg: linear-gradient(to bottom, #aaa, #777);
+            --button-grey-hover-bg: linear-gradient(to bottom, #bbb, #888);
+            --button-disabled-bg: #a0a0a0;
+
+            --text-color: var(--pokedex-light-grey);
+            --win-color: var(--pokedex-button-yellow);
+            --lose-color: #ff7b7b;
+            --win-glow-color: rgba(255, 203, 5, 0.7);
+            --cell-win-highlight: rgba(255, 235, 59, 0.4);
+            --win-line-color: rgba(255, 203, 5, 0.9);
+            --near-miss-color: gold;
+            --near-miss-line-color: rgba(255, 60, 60, 0.85);
+            --near-miss-shade-color: rgba(255, 215, 0, 0.15);
+            --hot-streak-color: #ff8c00;
+
+            /* Bonus Mode Theme */
+            --bonus-machine-bg: linear-gradient(145deg, #2b79d1, #1a5ca1);
+            --bonus-machine-border: #0c2c60;
+            --bonus-display-text: #87ceeb;
+            --bonus-win-glow-color: rgba(100, 150, 255, 0.8);
+            --bonus-cell-win-highlight: rgba(173, 216, 230, 0.5);
+            --bonus-win-line-color: rgba(173, 216, 230, 0.9);
+            --bonus-button-bg: linear-gradient(to bottom, #6d9ddd, #506caf);
+            --bonus-button-hover-bg: linear-gradient(to bottom, #7eadef, #5c7cb8);
+            --bonus-button-active-bg: linear-gradient(to bottom, #5c7cb8, #445c9d);
+
+
+            --currency-symbol: '¥';
+            --base-font-size: 10px;
+            --animation-speed: 1;
+        }
+
+        /* --- Global Styles --- */
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: 'Press Start 2P', 'Courier New', Courier, monospace; font-size: var(--base-font-size); background-color: var(--pokedex-black); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; overflow-x: hidden; letter-spacing: 0.5px; }
+        .hidden { display: none !important; }
+        .visually-hidden { visibility: hidden; opacity: 0; transition: visibility 0s linear 0.3s, opacity 0.3s linear; }
+        button { font-family: inherit; letter-spacing: inherit; }
+        input { font-family: inherit; }
+
+        /* --- Pre Screen (Start Page) --- */
+        #pre-screen { background-color: var(--control-panel-bg); padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 0 15px rgba(0,0,0,0.5); border: 3px solid var(--machine-border); max-width: 450px; color: var(--text-color); }
+        #pre-screen h1 { margin-top: 0; color: var(--win-color); font-size: 1.8em; text-shadow: 1px 1px var(--pokedex-black); margin-bottom: 25px; }
+        #pre-screen label { display: block; margin-bottom: 10px; font-size: 1.1em; }
+        #pre-screen input[type="number"] { padding: 8px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; width: 150px; text-align: right; background: #eee; color: #333; font-size: 1.3em; }
+        #pre-screen .currency-input { display: inline-flex; align-items: center; }
+        #pre-screen .currency-input::before { content: var(--currency-symbol); padding-right: 5px; color: var(--text-color); font-size: 1.1em; }
+        #pre-screen button { padding: 12px 25px; font-size: 1.1em; cursor: pointer; border-radius: 5px; border: none; background: var(--button-green-bg); color: white; transition: background 0.3s ease, transform 0.1s ease; text-shadow: 1px 1px #333; box-shadow: 0 3px #388E3C; }
+        #pre-screen button:hover { background: var(--button-green-hover-bg); transform: translateY(-1px); box-shadow: 0 4px #388E3C;}
+        #pre-screen button:active { transform: translateY(1px); box-shadow: 0 1px #388E3C; background: var(--button-green-active-bg); }
+        #start-error { color: var(--lose-color); margin-top: 10px; min-height: 1.2em; font-weight: bold; font-size: 1em; }
+
+        /* --- Game Container & Slot Machine Body --- */
+        .slot-machine { background: var(--machine-bg); border: 10px solid var(--machine-border); border-radius: 20px; padding: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 0, 0, 0.5); display: inline-flex; flex-direction: column; align-items: center; width: auto; max-width: 700px; min-width: 650px; transition: background 0.5s ease, border-color 0.5s ease; position: relative; overflow: hidden; }
+        .slot-machine.bonus-mode { background: var(--bonus-machine-bg); border-color: var(--bonus-machine-border); }
+
+        /* Corner Lights, Win Glow */
+         .corner-light { position: absolute; width: 30px; height: 30px; background: radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(255,203,5,0.8) 50%, rgba(255,150,0,0) 100%); border-radius: 50%; opacity: 0; transition: opacity 0.5s ease; box-shadow: 0 0 15px 5px rgba(255,203,5,0.5); pointer-events: none; z-index: 10; }
+         .corner-light.top-left { top: -10px; left: -10px; } .corner-light.top-right { top: -10px; right: -10px; }
+         .corner-light.flashing { opacity: 0.8; animation: corner-flash calc(0.3s / var(--animation-speed)) infinite alternate; }
+         @keyframes corner-flash { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.15); opacity: 0.5; } }
+        .slot-machine.bonus-mode .corner-light.flashing { animation: corner-flash-bonus calc(0.3s / var(--animation-speed)) infinite alternate; }
+        @keyframes corner-flash-bonus { 0% { background: radial-gradient(circle, rgba(173, 216, 230, 0.9) 0%, rgba(173, 216, 230, 0) 70%); box-shadow: 0 0 25px 10px rgba(173, 216, 230, 0.7); opacity: 1; transform: scale(1.1); } 100% { background: radial-gradient(circle, rgba(200, 226, 250, 0.6) 0%, rgba(200, 226, 250, 0) 70%); box-shadow: 0 0 15px 5px rgba(200, 226, 250, 0.5); opacity: 0.8; transform: scale(1); } }
+        .slot-machine.win-glow::before { content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border-radius: 25px; box-shadow: 0 0 25px 15px var(--current-win-glow-color, var(--win-glow-color)); animation: glow-pulse calc(0.8s / var(--animation-speed)) infinite alternate; pointer-events: none; z-index: -1; }
+         @keyframes glow-pulse { from { box-shadow: 0 0 20px 10px var(--current-win-glow-color, var(--win-glow-color)); opacity: 0.7; } to { box-shadow: 0 0 30px 18px var(--current-win-glow-color, var(--win-glow-color)); opacity: 1; } }
+
+        /* Title Image */
+        .game-title-image { display: block; width: 50%; max-width: 300px; height: auto; margin: 0 auto 15px auto; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5)); }
+
+        /* Reels & Cells */
+        .reels-container { position: relative; margin-bottom: 15px; width: fit-content; }
+        .reels { display: flex; gap: var(--reel-gap, 10px); background-color: #1a1a1a; padding: var(--reels-padding, 10px); border-radius: 10px; box-shadow: inset 0 0 15px rgba(0,0,0,0.8); overflow: hidden; border: 3px solid #555; position: relative; z-index: 1; height: calc(var(--cell-height, 100px) * var(--num-rows, 3) + 2 * var(--reels-padding, 10px)); }
+        #win-lines-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        .reel { background-color: var(--reel-bg); border: 1px solid var(--reel-border); overflow: hidden; width: var(--cell-width, 100px); height: calc(var(--cell-height, 100px) * var(--num-rows, 3)); position: relative; border-radius: 5px; }
+        .reel-strip { position: absolute; top: 0; left: 0; width: 100%; transition: top 0.1s linear; }
+        .cell { width: var(--cell-width, 100px); height: var(--cell-height, 100px); border-bottom: 1px solid var(--cell-border); display: flex; justify-content: center; align-items: center; overflow: hidden; background-color: #fff; transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease; position: relative; }
+        .cell:last-child { border-bottom: none; }
+        .cell img { max-width: 85%; max-height: 85%; object-fit: contain; image-rendering: pixelated; }
+         .cell.winning-cell { background-color: var(--current-cell-win-highlight, var(--cell-win-highlight)) !important; z-index: 10; animation: winning-cell-pulse calc(0.6s / var(--animation-speed)) infinite alternate; border-radius: 5px; box-shadow: 0 0 8px 3px var(--current-win-color, var(--win-color)); }
+        @keyframes winning-cell-pulse { 0% { transform: scale(1); box-shadow: 0 0 8px 3px var(--current-win-color, var(--win-color)); } 100% { transform: scale(1.05); box-shadow: 0 0 12px 5px var(--current-win-color, var(--win-color));} }
+        .cell.near-miss-cell { position: relative; z-index: 8; }
+        .cell.near-miss-cell::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 3px solid var(--near-miss-color); background-color: var(--near-miss-shade-color); border-radius: 5px; animation: near-miss-pulse calc(0.5s / var(--animation-speed)) infinite alternate; pointer-events: none; }
+        @keyframes near-miss-pulse { 0% { opacity: 0.6; box-shadow: 0 0 3px 1px var(--near-miss-color); } 100% { opacity: 1; box-shadow: 0 0 6px 2px var(--near-miss-color); } }
+
+        /* Info Bar (Row 3) */
+        .info-bar { display: flex; justify-content: space-around; align-items: center; width: 100%; background-color: var(--display-bg); padding: 8px 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: inset 0 0 8px rgba(0,0,0,0.6); border: 2px solid rgba(255,255,255,0.2); color: var(--display-text); font-size: 1.1em; }
+        .info-display { text-align: center; flex: 1; padding: 0 5px; min-width: 100px; }
+        .info-display span { display: block; font-size: 0.8em; color: #ccc; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 1px; }
+        .info-display div:not(.bet-control) { font-size: 1em; font-weight: bold; letter-spacing: 1px; min-height: 1.4em; transition: color 0.3s ease; }
+        #balance-display::before, #win-display::before { content: var(--currency-symbol); margin-right: 2px; font-weight: normal; font-size: 0.9em; vertical-align: baseline; color: var(--display-text); }
+        #win-display.highlight-win { color: var(--win-color); animation: pulse calc(0.4s / var(--animation-speed)) 3; transform-origin: center; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        /* Bet Input */
+        .bet-control { display: flex; align-items: center; justify-content: center; gap: 4px; position: relative; padding: 0; min-height: 1.4em; }
+        .bet-control .bet-currency-symbol { font-size: 1em; color: var(--display-text); margin-right: 1px; }
+        #bet-input { width: 70px; padding: 4px 6px; font-size: 1em; text-align: right; border: 1px solid #888; border-radius: 4px; background-color: #eee; color: #333; -moz-appearance: textfield; }
+        #bet-input::-webkit-outer-spin-button, #bet-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        #bet-input:disabled { background-color: #ddd; color: #aaa; cursor: not-allowed; opacity: 0.7; }
+
+        /* Message Bar (Row 4) */
+        #result { width: 100%; text-align: center; font-size: 1.1em; font-weight: bold; padding: 10px; margin-bottom: 15px; min-height: 2.5em; border-radius: 5px; background-color: rgba(0, 0, 0, 0.15); transition: all 0.3s ease; letter-spacing: 0.5px; text-shadow: 1px 1px #000; display: flex; align-items: center; justify-content: center; }
+         #result.win { color: var(--win-color); background-color: rgba(80, 160, 80, 0.2); border: 1px solid var(--win-color); text-shadow: 1px 1px #000, 0 0 5px var(--win-color); }
+         #result.lose { color: #aaa; background-color: rgba(0, 0, 0, 0.1); border: 1px solid #555; }
+         #result.near-miss-text { color: var(--near-miss-color); background-color: rgba(180, 150, 40, 0.15); border: 1px solid var(--near-miss-color); }
+         #result.bonus-trigger { color: var(--bonus-display-text); background-color: rgba(60, 100, 180, 0.25); border: 1px solid var(--bonus-display-text); text-shadow: 1px 1px #000, 0 0 5px var(--bonus-display-text);}
+         #result.hot-streak { color: var(--hot-streak-color); border: 1px solid var(--hot-streak-color); background-color: rgba(100, 40, 0, 0.3); }
+         #result.hot-streak::before { content: '🔥 '; } #result.hot-streak::after { content: ' 🔥'; }
+
+        /* Status/Bonus Area (Row 5) */
+        .status-area { display: flex; gap: 15px; width: 100%; margin-bottom: 15px; align-items: stretch; font-size: 1.1em; }
+        #bonus-info { flex: 1.2; text-align: center; padding: 10px; background-color: rgba(0, 0, 0, 0.2); border-radius: 8px; min-height: 5em; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: border 0.5s ease, box-shadow 0.5s ease, opacity 0.3s ease; border: 1px solid rgba(255,255,255,0.1); position: relative; overflow: hidden; }
+         .slot-machine.bonus-mode #bonus-info { border-color: var(--bonus-display-text); box-shadow: 0 0 8px rgba(135, 206, 235, 0.5); }
+         #bonus-info-text { font-size: 1em; line-height: 1.3; opacity: 0; transition: opacity 0.3s ease; position: absolute; pointer-events: none; width: 90%; }
+         #bonus-placeholder-text { font-size: 1em; color: #ccc; opacity: 1; transition: opacity 0.3s ease; position: absolute; pointer-events: none; width: 90%;}
+         .slot-machine.bonus-mode #bonus-info-text { opacity: 1; pointer-events: auto; }
+         .slot-machine.bonus-mode #bonus-placeholder-text { opacity: 0; }
+        #results-status { flex: 1; background-color: rgba(0, 0, 0, 0.2); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); position: relative; min-height: 5em; display: flex; flex-direction: column; justify-content: center; }
+        #bonus-tracker { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 5px; }
+        #bonus-tracker-text { font-size: 0.9em; color: var(--win-color); background-color: rgba(0,0,0,0.4); padding: 3px 6px; border-radius: 4px; white-space: nowrap; text-shadow: 1px 1px #000; }
+        #pokeball-counter { display: flex; gap: 8px; height: 30px; align-self: flex-end; }
+        #pokeball-counter img { height: 100%; width: auto; object-fit: contain; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.4)); transform-origin: bottom center; transition: opacity 0.4s ease, filter 0.4s ease, transform 0.3s ease; opacity: 0.25; filter: grayscale(90%); }
+         #pokeball-counter img.active { opacity: 1; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.7)); transform: scale(1.05); }
+         #pokeball-counter img.new-ball { animation: pokeball-appear calc(0.6s / var(--animation-speed)) cubic-bezier(0.34, 1.56, 0.64, 1); }
+          @keyframes pokeball-appear { 0% { transform: translateY(10px) scale(0.5); opacity: 0; } 60% { transform: translateY(-5px) scale(1.1); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+
+        /* Game Settings (Row 6) */
+        #main-controls { background-color: rgba(255, 255, 255, 0.05); padding: 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 15px; width: 100%; border: 1px solid rgba(255, 255, 255, 0.1); min-height: auto; text-align: center; font-size: 1.1em; }
+        .main-control-buttons { display: flex; justify-content: center; gap: 15px; margin-bottom: 12px; }
+        #unlock-rtp-button, #instructions-button, #speed-control-button { padding: 8px 15px; font-size: 0.9em; cursor: pointer; border-radius: 5px; border: none; color: white; text-shadow: 1px 1px #333; transition: all 0.2s ease; box-shadow: 0 2px rgba(0,0,0,0.4); }
+         #unlock-rtp-button { background: var(--button-grey-bg); }
+         #unlock-rtp-button:hover:not(:disabled) { background: var(--button-grey-hover-bg); transform: translateY(-1px); box-shadow: 0 3px rgba(0,0,0,0.4); }
+         #unlock-rtp-button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px rgba(0,0,0,0.4); }
+         #instructions-button { background: var(--button-blue-bg); box-shadow: 0 2px #2a6091; }
+         #instructions-button:hover:not(:disabled) { background: var(--button-blue-hover-bg); transform: translateY(-1px); box-shadow: 0 3px #2a6091;}
+         #instructions-button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px #2a6091; }
+         #speed-control-button { background: var(--button-orange-bg); box-shadow: 0 2px #c79100; }
+         #speed-control-button:hover:not(:disabled) { background: var(--button-orange-hover-bg); transform: translateY(-1px); box-shadow: 0 3px #c79100;}
+         #speed-control-button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px #c79100; }
+
+        /* RTP/Speed Control Container */
+         #sub-controls-container { margin-top: 10px; }
+         #rtp-control-container, #speed-control-container { background-color: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 8px; }
+         #rtp-control-container.hidden, #speed-control-container.hidden { display: none; }
+         .control-group { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 5px; }
+         .control-group label { flex-basis: auto; text-align: right; font-size: 0.8em; min-width: 40px; }
+         .control-group input[type="number"]#rtp-setting { width: 80px; padding: 4px 6px; font-size: 0.9em; text-align: right; border: 1px solid #888; border-radius: 4px; background-color: #eee; color: #333; -moz-appearance: textfield; }
+         .control-group input[type="number"]#rtp-setting::-webkit-outer-spin-button, .control-group input[type="number"]#rtp-setting::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+         .control-group input[type="range"] { flex-grow: 1; cursor: pointer; max-width: 250px; height: 8px; accent-color: var(--win-color); background: #555; border-radius: 4px; appearance: none; -webkit-appearance: none; }
+         .control-group input[type="range"]::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 16px; height: 16px; background: var(--pokedex-button-yellow); border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 0 3px rgba(0,0,0,0.5);}
+         .control-group input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; background: var(--pokedex-button-yellow); border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 0 3px rgba(0,0,0,0.5);}
+         .control-group .value-display { min-width: 55px; text-align: right; font-weight: bold; font-size: 0.9em; }
+         #lock-rtp-button, #hide-speed-button { display: inline-block; margin-left: 10px; padding: 4px 8px; font-size: 0.8em; cursor: pointer; border-radius: 4px; border: none; background: var(--button-grey-bg); color: white; text-shadow: 1px 1px #555; box-shadow: 0 2px #666; vertical-align: middle; }
+         #lock-rtp-button:hover:not(:disabled), #hide-speed-button:hover:not(:disabled) { background: var(--button-grey-hover-bg); }
+         #unlock-rtp-button:disabled, #instructions-button:disabled, #speed-control-button:disabled, #lock-rtp-button:disabled, #hide-speed-button:disabled { background: var(--button-disabled-bg) !important; opacity: 0.6; cursor: not-allowed; box-shadow: 0 2px rgba(0,0,0,0.4); transform: none !important; }
+         .control-group input:disabled { cursor: not-allowed; opacity: 0.5; accent-color: #888; }
+         .control-group input:disabled::-webkit-slider-thumb { background: #888; }
+         .control-group input:disabled::-moz-range-thumb { background: #888; }
+         .control-group input:disabled + .value-display, .control-group input:disabled ~ label { opacity: 0.5; cursor: not-allowed; }
+
+        /* Spin Controls (Row 7) */
+        .sim-controls { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; width: 100%; margin-top: 5px; font-size: 1.1em; min-height: 50px; align-items: center; }
+        .sim-controls button { padding: 10px 15px; font-size: 0.9em; font-weight: bold; cursor: pointer; border: none; border-radius: 6px; min-width: 70px; transition: all 0.2s ease; color: white; text-shadow: 1px 1px #333; letter-spacing: 0.5px; box-shadow: 0 3px rgba(0,0,0,0.4); flex-shrink: 0; }
+        .sim-controls button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px rgba(0,0,0,0.4); }
+        .sim-controls button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px rgba(0,0,0,0.4); }
+        .sim-controls button:disabled { background-color: var(--button-disabled-bg) !important; background: var(--button-disabled-bg) !important; color: #aaa; cursor: not-allowed; opacity: 0.7; box-shadow: 0 3px rgba(0,0,0,0.2); text-shadow: none; transform: none !important; }
+        .sim-controls button#spin-button { background: var(--button-green-bg); flex-grow: 1; max-width: 150px; font-size: 1.1em; box-shadow: 0 3px #388E3C; }
+        .slot-machine.bonus-mode .sim-controls button#spin-button { background: var(--bonus-button-bg); box-shadow: 0 3px #374F8B; }
+         .sim-controls button#spin-button:hover:not(:disabled) { background: linear-gradient(to bottom, #80f080, #5cb85c); }
+         .sim-controls button#spin-button:active:not(:disabled) { background: linear-gradient(to bottom, #5cb85c, #449d44); }
+         .slot-machine.bonus-mode .sim-controls button#spin-button:hover:not(:disabled) { background: var(--bonus-button-hover-bg); }
+         .slot-machine.bonus-mode .sim-controls button#spin-button:active:not(:disabled) { background: var(--bonus-button-active-bg); }
+         .sim-controls .auto-reset-group { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+         .sim-controls .auto-spin-controls { display: flex; gap: 6px; align-items: center; flex-shrink: 0; transition: opacity 0.3s ease, visibility 0s linear 0s; }
+         .sim-controls .auto-spin-controls.visually-hidden { visibility: hidden; opacity: 0; transition: visibility 0s linear 0.3s, opacity 0.3s linear; }
+         .sim-controls .auto-spin-controls button { background: var(--button-orange-bg); color: #fff; min-width: 55px; font-size: 0.8em; box-shadow: 0 3px #c79100; }
+         .sim-controls .auto-spin-controls button:hover:not(:disabled) { background: var(--button-orange-hover-bg); }
+         .sim-controls .auto-spin-controls button:active:not(:disabled) { background: var(--button-orange-active-bg); }
+         .sim-controls button#stop-auto-spin-button { background: var(--button-red-bg) !important; color: white; min-width: 100px; box-shadow: 0 3px #a71d2a; flex-shrink: 0; transition: opacity 0.3s ease, visibility 0s linear 0s; }
+         .sim-controls button#stop-auto-spin-button.visually-hidden { visibility: hidden; opacity: 0; transition: visibility 0s linear 0.3s, opacity 0.3s linear; }
+         .sim-controls button#stop-auto-spin-button:hover:not(:disabled) { background: var(--button-red-hover-bg) !important; }
+         .sim-controls button#stop-auto-spin-button:active:not(:disabled) { background: var(--button-red-active-bg) !important; }
+         .sim-controls button#reset-button { background: var(--button-grey-bg); min-width: 100px; box-shadow: 0 3px #4a5054; margin-left: 4px; }
+         .sim-controls button#reset-button:hover:not(:disabled) { background: var(--button-grey-hover-bg); }
+         .sim-controls button#reset-button:active:not(:disabled) { background: #666; }
+
+        /* --- Modals --- */
+         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+         .modal-overlay:not(.hidden):not(.visually-hidden) { opacity: 1; pointer-events: auto; }
+         .modal-content { background-color: var(--pokedex-dark-grey); color: var(--text-color); width: 90%; max-width: 600px; max-height: 85vh; padding: 20px; border-radius: 10px; border: 3px solid #666; position: relative; transform: scale(0.9); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; overflow-y: auto; }
+         .modal-overlay:not(.hidden):not(.visually-hidden) .modal-content { transform: scale(1); opacity: 1; }
+         .modal-close-button { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #fff; font-size: 1.8em; cursor: pointer; line-height: 1; padding: 0; text-shadow: 1px 1px #000; }
+         .modal-content h2 { color: var(--win-color); text-align: center; margin-top: 0; margin-bottom: 15px; font-size: 1.4em; text-shadow: 1px 1px #000; }
+         .modal-content h3 { color: #eee; margin-top: 15px; margin-bottom: 8px; font-size: 1.1em; border-bottom: 1px solid #666; padding-bottom: 4px; }
+         .modal-content p, .modal-content li { font-size: 0.95em; line-height: 1.5; margin-bottom: 8px; }
+         .modal-content ul { padding-left: 18px; list-style: square; }
+
+        /* WTP Overlay */
+        #whos-that-pokemon-overlay { z-index: 1050; }
+        #whos-that-pokemon-overlay .modal-content { background: radial-gradient(circle, #333 0%, #111 100%); border-color: var(--win-color); box-shadow: 0 0 25px var(--win-color); text-align: center; max-width: 450px; }
+         .wtp-image-container { width: 180px; height: 180px; margin: 0 auto 15px auto; position: relative; }
+         .wtp-image-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity 0.5s ease-in-out; image-rendering: pixelated; }
+         #wtp-shadow { filter: brightness(0) contrast(1000%); opacity: 1; }
+         #wtp-revealed { opacity: 0; }
+         .wtp-content.revealed #wtp-shadow { opacity: 0; }
+         .wtp-content.revealed #wtp-revealed { opacity: 1; animation: pokemon-reveal-pop calc(0.5s / var(--animation-speed)) ease-out calc(0.3s / var(--animation-speed)); /* Adjust timing slightly */ }
+         @keyframes pokemon-reveal-pop { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+         /* --- WTP Info Text Style Fix --- */
+         #wtp-info { margin-top: 15px; font-size: 0.9em; line-height: 1.4; color: #eee; opacity: 0; /* Start hidden */ transform: translateY(15px); /* Start slightly lower */ transition: opacity calc(0.4s / var(--animation-speed)) ease-out calc(0.5s / var(--animation-speed)), transform calc(0.4s / var(--animation-speed)) ease-out calc(0.5s / var(--animation-speed)); /* Fade/slide in after reveal */ }
+         .wtp-content.revealed #wtp-info { opacity: 1; transform: translateY(0); }
+         #wtp-info p { margin: 4px 0; color: #eee; /* Ensure text color */ }
+         #wtp-info span { color: var(--win-color); font-weight: bold; font-size: 1em; }
+         #wtp-info .bonus-highlight { color: #a9d1ff; font-weight: bold; }
+         #wtp-info p:nth-child(1) { font-size: 1.1em; color: var(--win-color); }
+
+        /* Password Prompt Modal */
+        #password-prompt-overlay { z-index: 1100; }
+        #password-prompt-overlay .modal-content { max-width: 350px; text-align: center; }
+        .password-prompt-content label { display: block; margin-bottom: 8px; font-size: 1em; color: #eee; }
+        .password-prompt-content #password-hint { font-size: 0.8em; color: #aaa; margin-bottom: 12px; font-style: italic; }
+        .password-prompt-content input[type="password"] { padding: 8px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; width: 180px; background: #eee; color: #333; font-size: 1.2em; text-align: center; }
+        .password-prompt-buttons button { padding: 8px 18px; font-size: 0.9em; cursor: pointer; border-radius: 5px; border: none; margin: 0 8px; color: white; transition: background 0.3s ease; text-shadow: 1px 1px #333; box-shadow: 0 2px #444; }
+        #password-submit { background: var(--button-green-bg); box-shadow: 0 2px #388E3C; }
+        #password-cancel { background: var(--button-grey-bg); box-shadow: 0 2px #555; }
+        #password-submit:hover { background: var(--button-green-hover-bg); }
+        #password-cancel:hover { background: var(--button-grey-hover-bg); }
+
+        /* Instructions Modal */
+        #instructions-overlay { z-index: 1050; }
+        #instructions-overlay .modal-content { max-width: 700px; }
+        .instructions-content .payout-table { width: 100%; border-collapse: collapse; margin-top: 10px; background-color: rgba(0,0,0,0.1); }
+        .instructions-content .payout-table th, .instructions-content .payout-table td { border: 1px solid #666; padding: 5px 6px; text-align: center; font-size: 0.85em; vertical-align: middle;}
+        .instructions-content .payout-table th { background-color: #555; color: var(--win-color); }
+        .instructions-content .payout-table .poke-cell { text-align: left; display: flex; align-items: center; gap: 5px; }
+        .instructions-content .payout-table .poke-cell img { height: 2.5em; max-width: 3em; object-fit: contain; image-rendering: pixelated; background: rgba(255,255,255,0.1); border-radius: 3px; padding: 2px;}
+        .instructions-content .poke-name { font-weight: bold; }
+        .instructions-content .poke-tier { font-size: 0.8em; color: #ccc; display: block; }
+        .instructions-content .bonus-details { color: #a9d1ff; font-weight: bold; }
+        .instructions-content .payout-multiplier { font-weight: bold; color: var(--pokedex-screen-text); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Pre-Screen DIV -->
+    <div id="pre-screen">
+        <h1>Pokémon Slots!</h1>
+        <label for="start-money">Enter starting balance (PokéCoins):</label>
+        <span class="currency-input">
+            <input type="number" id="start-money" value="1000" min="10" step="10">
+        </span>
+        <button id="start-button">Start Playing!</button>
+        <div id="start-error"></div>
+    </div>
+
+    <!-- Game Container DIV -->
+    <div id="game-container" class="hidden">
+        <div class="slot-machine" id="slot-machine-body">
+            <div class="corner-light top-left"></div> <div class="corner-light top-right"></div>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/International_Pok%C3%A9mon_logo.svg/1280px-International_Pok%C3%A9mon_logo.svg.png" alt="Pokemon Logo" class="game-title-image">
+            <div class="reels-container"> <div class="reels" id="reels-grid"></div> <canvas id="win-lines-canvas"></canvas> </div>
+            <div class="info-bar"> <div class="info-display"><span>Balance</span><div id="balance-display">0</div></div> <div class="info-display"> <span>Bet</span> <div class="bet-control"> <span class="bet-currency-symbol">¥</span> <input type="number" id="bet-input" value="10" min="1" max="100" step="1"> </div> </div> <div class="info-display"><span>Win</span><div id="win-display">0</div></div> </div>
+             <div id="result">Enter starting money!</div>
+             <div class="status-area"> <div id="bonus-info"> <div id="bonus-info-text"></div> <div id="bonus-placeholder-text">Standard Round</div> </div> <div id="results-status"> <div id="bonus-tracker"> <span id="bonus-tracker-text">Wins for Bonus: 0 / 4</span> <div id="pokeball-counter"></div> </div> </div> </div>
+             <div id="main-controls"> <div class="main-control-buttons"> <button id="unlock-rtp-button">RTP (Admin)</button> <button id="speed-control-button">Speed</button> <button id="instructions-button">Instructions</button> </div> <div id="sub-controls-container"> <div id="rtp-control-container" class="hidden"> <div class="control-group"> <label for="rtp-setting">RTP Adj:</label> <input type="number" id="rtp-setting" min="0" max="500" step="1" value="100"> <span class="value-display" id="rtp-setting-value">100%</span> <button id="lock-rtp-button" title="Hide RTP Setting">Hide</button> </div> <p style="font-size: 0.8em; color: #aaa; margin-top: 5px; text-align: center;">Note: Affects win amount multiplier (%).</p> </div> <div id="speed-control-container" class="hidden"> <div class="control-group"> <label for="speed-setting">Speed:</label> <input type="range" id="speed-setting" min="100" max="200" step="10" value="100"> <span class="value-display" id="speed-setting-value">1.0x</span> <button id="hide-speed-button" title="Hide Speed Control">Hide</button> </div> </div> </div> </div>
+             <div class="sim-controls">
+                 <button id="spin-button" disabled>SPIN</button>
+                 <div class="auto-reset-group">
+                     <div class="auto-spin-controls visually-hidden" id="auto-spin-options">
+                         <button data-spins="10">Auto 10</button> <button data-spins="20">Auto 20</button> <button data-spins="30">Auto 30</button> <button data-spins="-1">Auto ∞</button>
+                     </div>
+                     <button id="stop-auto-spin-button" class="visually-hidden">Stop Auto</button>
+                     <button id="reset-button">Reset</button>
+                 </div>
+             </div>
+        </div>
+    </div>
+
+    <!-- WTP Overlay -->
+    <div id="whos-that-pokemon-overlay" class="modal-overlay hidden">
+        <div class="wtp-content modal-content">
+            <h2>Who's That Pokémon?!</h2>
+            <div class="wtp-image-container"> <img id="wtp-shadow" src="" alt="Pokémon Shadow"> <img id="wtp-revealed" src="" alt="Revealed Pokémon"> </div>
+            <div id="wtp-info"> <p>It's <span id="wtp-name"></span>!</p> <p class="bonus-highlight">BONUS ROUND TRIGGERED!</p> <p id="wtp-bonus-spins"></p> <p id="wtp-bonus-rtp"></p> </div>
+        </div>
+    </div>
+
+    <!-- Password Prompt Modal -->
+    <div id="password-prompt-overlay" class="modal-overlay hidden">
+        <div class="password-prompt-content modal-content">
+            <button class="modal-close-button" onclick="document.getElementById('password-prompt-overlay').classList.add('hidden'); if(passwordResolve) { passwordResolve(null); passwordResolve = null; }">&times;</button>
+            <label for="password-input">Enter Admin Password</label> <p id="password-hint">Hint: Gotta catch 'em all!</p> <input type="password" id="password-input" autofocus>
+            <div class="password-prompt-buttons"> <button id="password-submit">Unlock</button> <button id="password-cancel">Cancel</button> </div>
+        </div>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div id="instructions-overlay" class="modal-overlay hidden">
+        <div class="instructions-content modal-content">
+            <button id="instructions-close-button" class="modal-close-button">&times;</button>
+            <h2>Instructions & Payouts</h2>
+            <h3>How to Play</h3> <p id="instructions-how-to-play"></p>
+            <h3>Paylines</h3> <p id="instructions-paylines"></p> <p style="font-size:0.8em; color:#ccc;">(Examples: Top/Middle/Bottom Rows, V-Shape, Zig-Zags etc.)</p>
+            <h3>Payouts (Multiplier x Current Bet x RTP Adj.)</h3> <div id="payout-table-container"></div>
+            <h3>Bonus Round</h3> <p id="instructions-bonus"></p>
+            <h3>Near Miss</h3> <p>If you land 2 matching symbols on a payline starting from the left, but miss the 3rd, the potential winning line (in <span style="color:var(--near-miss-line-color)">red</span>) and the missed spot (highlighted in <span style="color:var(--near-miss-color)">gold</span>) will be briefly shown!</p>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const NUM_REELS = 5; const NUM_ROWS = 3; const EXTRA_SYMBOLS = 3;
+        const CELL_WIDTH = 100; const CELL_HEIGHT = 100; const REEL_GAP = 10; const REELS_PADDING = 10;
+
+        // --- Data Structures ---
+        const pokemonGen1Starters = [ { name: "Bulbasaur", url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", tier: 1 }, { name: "Charmander", url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png", tier: 1 }, { name: "Squirtle", url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png", tier: 1 }, { name: "Ivysaur", url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png", tier: 2 }, { name: "Charmeleon", url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png", tier: 2 }, { name: "Wartortle", url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png", tier: 2 }, { name: "Venusaur", url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png", tier: 3 }, { name: "Charizard", url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png", tier: 3 }, { name: "Blastoise", url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png", tier: 3 }, ];
+        const pokemonLegendaries = [ { name: 'Articuno', tier: 3, url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/144.png' }, { name: 'Zapdos', tier: 3, url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/145.png' }, { name: 'Moltres', tier: 3, url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/146.png' }, { name: 'Groudon', tier: 4, url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/383.png' }, { name: 'Kyogre', tier: 4, url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/382.png' }, { name: 'Rayquaza', tier: 4, url: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/384.png' }, { name: "Mewtwo", url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png", tier: 5 }, { name: "Mew", url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png", tier: 5 }, ];
+        const basePayouts = { 1: { 3: 0.5, 4: 1.5, 5: 2.5 }, 2: { 3: 1, 4: 2, 5: 5 }, 3: { 3: 1.5, 4: 3, 5: 7.5 }, 4: { 3: 2.5, 4: 5, 5: 12.5 }, 5: { 3: 5, 4: 12.5, 5: 25 } };
+        const paylines = [ [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]], [[1, 0], [1, 1], [1, 2], [1, 3], [1, 4]], [[2, 0], [2, 1], [2, 2], [2, 3], [2, 4]], [[0, 0], [1, 1], [2, 2], [1, 3], [0, 4]], [[2, 0], [1, 1], [0, 2], [1, 3], [2, 4]], [[0, 0], [0, 1], [1, 2], [2, 3], [2, 4]], [[2, 0], [2, 1], [1, 2], [0, 3], [0, 4]], [[1, 0], [0, 1], [0, 2], [0, 3], [1, 4]], [[1, 0], [2, 1], [2, 2], [2, 3], [1, 4]], [[0, 0], [1, 1], [0, 2], [1, 3], [0, 4]], [[2, 0], [1, 1], [2, 2], [1, 3], [2, 4]], [[1, 0], [1, 1], [0, 2], [1, 3], [1, 4]], [[1, 0], [1, 1], [2, 2], [1, 3], [1, 4]], [[0, 1], [1, 2], [2, 3], [1, 4], [0, 3]], [[2, 1], [1, 2], [0, 3], [1, 4], [2, 3]], [[0, 0], [1, 1], [1, 2], [1, 3], [0, 4]], [[2, 0], [1, 1], [1, 2], [1, 3], [2, 4]], [[0, 1], [1, 0], [2, 1], [1, 2], [0, 3]], [[2, 1], [1, 0], [0, 1], [1, 2], [2, 3]], [[2, 0], [1, 1], [1, 2], [1, 3], [2, 4]], [[0, 0], [1, 1], [2, 2], [2, 3], [2, 4]], [[2, 0], [1, 1], [0, 2], [0, 3], [0, 4]], ];
+        const pokeballImages = [ "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/great-ball.png", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png" ];
+        const wtpCandidates = pokemonLegendaries;
+
+        // --- Timings and Game Rules ---
+        const SPIN_INTERVAL_TIME = 40; const SPIN_DURATION_BASE = 600; const REEL_STOP_DELAY_INCREMENT = 350; const BOUNCE_DURATION = 150; const BOUNCE_AMOUNT = 10;
+        const WINS_NEEDED_FOR_BONUS = 4; const BONUS_SPINS_GRANTED = 10; const BONUS_RTP_MULTIPLIER = 2.0;
+        const AUTO_SPIN_DELAY = 800; const WIN_HIGHLIGHT_DURATION = 2500; const NEAR_MISS_DURATION = 1500; const WTP_REVEAL_DELAY = 1000; const WTP_TOTAL_DURATION = 4500;
+        const RTP_PASSWORD = "Ash"; const CURRENCY_SYMBOL = '¥'; const DEFAULT_BET = 10; const MIN_BET = 1; const MAX_BET = 100; const BET_STEP = 1; const HOT_STREAK_THRESHOLD = 2; const HOT_STREAK_MULTIPLIER_BONUS = 0;
+
+        // --- DOM Elements ---
+        const preScreen = document.getElementById('pre-screen'); const startMoneyInput = document.getElementById('start-money'); const startButton = document.getElementById('start-button'); const startError = document.getElementById('start-error'); const gameContainer = document.getElementById('game-container'); const reelsContainer = document.querySelector('.reels-container'); const reelsGridElement = document.getElementById('reels-grid'); const winLinesCanvas = document.getElementById('win-lines-canvas'); const winLinesContext = winLinesCanvas.getContext('2d'); const spinButton = document.getElementById('spin-button'); const autoSpinOptionsContainer = document.getElementById('auto-spin-options'); const stopAutoSpinButton = document.getElementById('stop-auto-spin-button'); const resetButton = document.getElementById('reset-button'); const resultDisplay = document.getElementById('result'); const balanceDisplay = document.getElementById('balance-display'); const winDisplay = document.getElementById('win-display'); const slotMachineBody = document.getElementById('slot-machine-body'); const betInput = document.getElementById('bet-input'); const rtpSettingInput = document.getElementById('rtp-setting'); const rtpValueDisplay = document.getElementById('rtp-setting-value'); const bonusInfoDisplay = document.getElementById('bonus-info'); const bonusInfoText = document.getElementById('bonus-info-text'); const bonusPlaceholderText = document.getElementById('bonus-placeholder-text'); const resultsStatusDisplay = document.getElementById('results-status'); const bonusTrackerText = document.getElementById('bonus-tracker-text'); const pokeballCounterElement = document.getElementById('pokeball-counter'); const cornerLights = document.querySelectorAll('.corner-light'); const wtpOverlay = document.getElementById('whos-that-pokemon-overlay'); const wtpContent = wtpOverlay.querySelector('.wtp-content'); const wtpShadowImg = document.getElementById('wtp-shadow'); const wtpRevealedImg = document.getElementById('wtp-revealed'); const wtpInfoDiv = document.getElementById('wtp-info'); const wtpNameSpan = document.getElementById('wtp-name'); const wtpBonusSpinsP = document.getElementById('wtp-bonus-spins'); const wtpBonusRtpP = document.getElementById('wtp-bonus-rtp'); const unlockRtpButton = document.getElementById('unlock-rtp-button'); const rtpControlContainer = document.getElementById('rtp-control-container'); const lockRtpButton = document.getElementById('lock-rtp-button'); const passwordPromptOverlay = document.getElementById('password-prompt-overlay'); const passwordInput = document.getElementById('password-input'); const passwordHint = document.getElementById('password-hint'); const passwordSubmitButton = document.getElementById('password-submit'); const passwordCancelButton = document.getElementById('password-cancel'); const instructionsButton = document.getElementById('instructions-button'); const instructionsOverlay = document.getElementById('instructions-overlay'); const instructionsCloseButton = document.getElementById('instructions-close-button'); const payoutTableContainer = document.getElementById('payout-table-container'); const speedControlButton = document.getElementById('speed-control-button'); const speedControlContainer = document.getElementById('speed-control-container'); const speedSlider = document.getElementById('speed-setting'); const speedValueDisplay = document.getElementById('speed-setting-value'); const hideSpeedButton = document.getElementById('hide-speed-button');
+
+        // --- Simulation State ---
+        let isSpinning = false; let isAutoSpinning = false; let autoSpinsRemaining = 0; let reelSpinIntervals = []; let reelStrips = []; let finalGridSymbols = []; let cellElements = []; let balance = 0; let currentBet = DEFAULT_BET; let currentWin = 0; let currentRTP = 100; let winsForBonusCounter = 0; let isInBonusRound = false; let bonusSpinsRemaining = 0; let winHighlightTimeout = null; let autoSpinTimeout = null; let reelStopTimers = []; let currentWinningLines = []; let wtpAnimationTimeout = null; let consecutiveWins = 0; let nearMissHighlightTimeout = null; let currentNearMissLines = []; let rtpUnlocked = false; let passwordResolve = null; let animationSpeedMultiplier = 1.0; let bonusRoundEndedButNotReset = false;
+
+        // --- Utility Functions ---
+        function formatCurrency(amount) { return amount.toFixed(BET_STEP < 1 ? 2 : 0); }
+        function getSymbolsForCurrentRound() { return isInBonusRound ? pokemonLegendaries : pokemonGen1Starters; }
+        function getRandomPokemon() { const symbols = getSymbolsForCurrentRound(); return symbols[Math.floor(Math.random() * symbols.length)]; }
+        function getAnimationSpeed() { return animationSpeedMultiplier; }
+        function setCSSVariable(name, value) { document.documentElement.style.setProperty(name, value); }
+
+        // --- Display Updates ---
+        function updatePokeballDisplay() { pokeballCounterElement.innerHTML = ''; const ballsEarned = winsForBonusCounter; const winsNeeded = WINS_NEEDED_FOR_BONUS; for (let i = 0; i < winsNeeded; i++) { if (pokeballImages[i % pokeballImages.length]) { const img = document.createElement('img'); img.src = pokeballImages[i % pokeballImages.length]; img.alt = `Pokeball ${i + 1}`; const isActive = i < ballsEarned; img.classList.toggle('active', isActive); if (isActive && i === ballsEarned - 1 && currentWin > 0 && !isInBonusRound && !isSpinning) { img.classList.add('new-ball'); setTimeout(() => { if(img) img.classList.add('active'); }, 10); setTimeout(() => { if(img) img.classList.remove('new-ball'); }, 600 / getAnimationSpeed()); } pokeballCounterElement.appendChild(img); } } bonusTrackerText.textContent = `Wins for Bonus: ${ballsEarned} / ${winsNeeded}`; }
+        function updateDisplays() {
+             balanceDisplay.textContent = formatCurrency(balance); if (document.activeElement !== betInput) { betInput.value = formatCurrency(currentBet); } winDisplay.textContent = formatCurrency(currentWin); updatePokeballDisplay();
+             const isBonusTheme = isInBonusRound || bonusRoundEndedButNotReset; slotMachineBody.classList.toggle('bonus-mode', isBonusTheme);
+             if (isInBonusRound) { bonusInfoText.innerHTML = `<span style="color: var(--bonus-display-text);">✨ BONUS ACTIVE! ✨</span> <br> <span style="color: var(--win-color);">Spins Left: ${bonusSpinsRemaining}</span>`; bonusPlaceholderText.style.opacity = '0'; }
+             else if (bonusRoundEndedButNotReset) { bonusInfoText.innerHTML = `<span style="color: var(--bonus-display-text);">✨ BONUS ENDED ✨</span> <br> <span style="color: var(--win-color);">Spin for Standard Round</span>`; bonusPlaceholderText.style.opacity = '0'; }
+             else { bonusInfoText.innerHTML = ''; bonusPlaceholderText.style.opacity = '1'; }
+             rtpValueDisplay.textContent = rtpUnlocked ? `${currentRTP}%` : 'Locked'; rtpSettingInput.value = currentRTP; rtpSettingInput.disabled = isSpinning || isAutoSpinning || !rtpUnlocked || isInBonusRound || bonusRoundEndedButNotReset; rtpSettingInput.style.opacity = rtpSettingInput.disabled ? 0.5 : 1; lockRtpButton.disabled = isSpinning || isAutoSpinning || !rtpUnlocked || isInBonusRound || bonusRoundEndedButNotReset; rtpControlContainer.classList.toggle('hidden', !rtpUnlocked || isInBonusRound || bonusRoundEndedButNotReset); unlockRtpButton.classList.toggle('hidden', rtpUnlocked || isInBonusRound || bonusRoundEndedButNotReset); unlockRtpButton.disabled = isSpinning || isAutoSpinning || isInBonusRound || bonusRoundEndedButNotReset; lockRtpButton.classList.toggle('hidden', !rtpUnlocked || isInBonusRound || bonusRoundEndedButNotReset);
+             speedValueDisplay.textContent = `${getAnimationSpeed().toFixed(1)}x`; speedSlider.value = getAnimationSpeed() * 100; speedSlider.disabled = isSpinning || isAutoSpinning; speedControlButton.disabled = isSpinning || isAutoSpinning; hideSpeedButton.disabled = isSpinning || isAutoSpinning; setCSSVariable('--animation-speed', getAnimationSpeed());
+             winDisplay.classList.remove('highlight-win'); if (currentWin > 0 && !isSpinning) { setTimeout(() => winDisplay.classList.add('highlight-win'), 10); }
+         }
+
+        // --- Grid & Canvas ---
+        function createGrid() { reelsGridElement.innerHTML = ''; reelStrips = []; cellElements = Array(NUM_ROWS).fill(null).map(() => Array(NUM_REELS).fill(null)); reelsGridElement.style.setProperty('--num-rows', NUM_ROWS); reelsGridElement.style.setProperty('--num-reels', NUM_REELS); reelsGridElement.style.setProperty('--cell-width', `${CELL_WIDTH}px`); reelsGridElement.style.setProperty('--cell-height', `${CELL_HEIGHT}px`); reelsGridElement.style.setProperty('--reel-gap', `${REEL_GAP}px`); reelsGridElement.style.setProperty('--reels-padding', `${REELS_PADDING}px`); reelsGridElement.style.height = `${CELL_HEIGHT * NUM_ROWS + 2 * REELS_PADDING}px`; for (let reel = 0; reel < NUM_REELS; reel++) { const reelElement = document.createElement('div'); reelElement.classList.add('reel'); const reelStrip = document.createElement('div'); reelStrip.classList.add('reel-strip'); reelStrips.push(reelStrip); const totalStripSymbols = NUM_ROWS + EXTRA_SYMBOLS * 2; for (let i = 0; i < totalStripSymbols; i++) { const pokemon = getRandomPokemon(); const cell = document.createElement('div'); cell.classList.add('cell'); const img = document.createElement('img'); img.src = pokemon.url; img.alt = pokemon.name; img.dataset.pokemonName = pokemon.name; img.dataset.pokemonTier = pokemon.tier; cell.appendChild(img); reelStrip.appendChild(cell); if (i >= EXTRA_SYMBOLS && i < EXTRA_SYMBOLS + NUM_ROWS) { cellElements[i-EXTRA_SYMBOLS][reel] = cell; } } reelStrip.style.top = `-${EXTRA_SYMBOLS * CELL_HEIGHT}px`; reelElement.appendChild(reelStrip); reelsGridElement.appendChild(reelElement); } resizeWinCanvas(); }
+        function resizeWinCanvas() { requestAnimationFrame(() => { if (!reelsGridElement || !reelsGridElement.offsetParent || !winLinesCanvas) return; const totalWidth = NUM_REELS * CELL_WIDTH + (NUM_REELS - 1) * REEL_GAP + 2 * REELS_PADDING; const totalHeight = NUM_ROWS * CELL_HEIGHT + 2 * REELS_PADDING; const scale = window.devicePixelRatio || 1; winLinesCanvas.width = totalWidth * scale; winLinesCanvas.height = totalHeight * scale; winLinesCanvas.style.width = `${totalWidth}px`; winLinesCanvas.style.height = `${totalHeight}px`; winLinesCanvas.style.top = `0px`; winLinesCanvas.style.left = `0px`; winLinesContext.scale(scale, scale); clearWinLines(); if (currentWinningLines.length > 0 && !isSpinning) { drawWinLines(currentWinningLines); } else if (currentNearMissLines.length > 0 && !isSpinning) { drawNearMissLines(currentNearMissLines); } }); }
+
+        // --- Bet Input ---
+        betInput.addEventListener('change', handleBetInputChange); betInput.addEventListener('input', handleBetInputChange);
+        function handleBetInputChange(e) { if (isSpinning || isAutoSpinning || isInBonusRound || bonusRoundEndedButNotReset) { e.target.value = formatCurrency(currentBet); return; } let value = parseFloat(e.target.value); if (isNaN(value)) { value = MIN_BET; } value = Math.max(MIN_BET, Math.min(MAX_BET, value)); value = BET_STEP > 0 ? Math.round(value / BET_STEP) * BET_STEP : value; value = Math.max(MIN_BET, Math.min(MAX_BET, value)); if (value !== currentBet) { currentBet = value; checkBalanceForSpin(); } if (e.type === 'change' || parseFloat(e.target.value) !== currentBet) { e.target.value = formatCurrency(currentBet); } }
+
+        // --- RTP & Speed Settings ---
+        unlockRtpButton.addEventListener('click', async () => { if (isSpinning || isAutoSpinning || isInBonusRound || bonusRoundEndedButNotReset) return; try { const passwordCorrect = await showPasswordPrompt(); if (passwordCorrect) { rtpUnlocked = true; resultDisplay.textContent = "RTP Controls Unlocked!"; resultDisplay.className = 'result'; updateDisplays(); } else if(passwordCorrect === false) { resultDisplay.textContent = "Incorrect Password."; resultDisplay.className = 'result lose'; } } catch (error) { console.log("Password prompt cancelled:", error); } });
+        lockRtpButton.addEventListener('click', () => { if (isSpinning || isAutoSpinning || isInBonusRound || bonusRoundEndedButNotReset) return; rtpUnlocked = false; rtpControlContainer.classList.add('hidden'); updateDisplays(); });
+        rtpSettingInput.addEventListener('input', (e) => { if (!rtpUnlocked || isSpinning || isAutoSpinning || isInBonusRound || bonusRoundEndedButNotReset) { e.target.value = currentRTP; return; } let value = parseFloat(e.target.value); if (isNaN(value)) { value = 100; } value = Math.max(0, Math.min(500, value)); currentRTP = value; updateDisplays(); });
+        rtpSettingInput.addEventListener('change', (e) => { if (!rtpUnlocked || isSpinning || isAutoSpinning || isInBonusRound || bonusRoundEndedButNotReset) { e.target.value = currentRTP; return; } let value = parseFloat(e.target.value); if (isNaN(value)) { value = 100; } value = Math.max(0, Math.min(500, value)); currentRTP = value; e.target.value = currentRTP; updateDisplays(); });
+        speedControlButton.addEventListener('click', () => { if (isSpinning || isAutoSpinning) return; speedControlContainer.classList.toggle('hidden'); });
+        hideSpeedButton.addEventListener('click', () => { speedControlContainer.classList.add('hidden'); });
+        speedSlider.addEventListener('input', (e) => { animationSpeedMultiplier = parseInt(e.target.value) / 100; updateDisplays(); });
+        function getEffectiveRTPMultiplier() { let baseMultiplier = rtpUnlocked ? (currentRTP / 100.0) : (100.0 / 100.0); baseMultiplier = Math.max(0.01, baseMultiplier); if (isInBonusRound) { return BONUS_RTP_MULTIPLIER; } return baseMultiplier; }
+
+        // --- Password Prompt ---
+        function showPasswordPrompt() { return new Promise((resolve) => { passwordResolve = resolve; passwordInput.value = ''; passwordHint.textContent = "Hint: Gotta catch 'em all!"; passwordPromptOverlay.classList.remove('hidden'); passwordInput.focus(); }); }
+        passwordSubmitButton.addEventListener('click', () => { const enteredPassword = passwordInput.value; passwordPromptOverlay.classList.add('hidden'); if (passwordResolve) { passwordResolve(enteredPassword === RTP_PASSWORD); passwordResolve = null; } });
+        passwordCancelButton.addEventListener('click', () => { passwordPromptOverlay.classList.add('hidden'); if (passwordResolve) { passwordResolve(null); passwordResolve = null; } });
+        passwordPromptOverlay.querySelector('.modal-close-button')?.addEventListener('click', () => { passwordPromptOverlay.classList.add('hidden'); if (passwordResolve) { passwordResolve(null); passwordResolve = null; } });
+        passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { passwordSubmitButton.click(); } });
+
+        // --- Check Balance & Update Controls (Visibility Fix) ---
+        function checkBalanceForSpin() { const canAfford = balance >= currentBet; let spinButtonDisabled = false; let spinButtonText = 'SPIN'; if (bonusRoundEndedButNotReset) { spinButtonText = 'SPIN'; spinButtonDisabled = isSpinning || !canAfford; } else if (isInBonusRound) { spinButtonText = `BONUS (${bonusSpinsRemaining})`; spinButtonDisabled = isSpinning || bonusSpinsRemaining <= 0; } else if (isAutoSpinning) { spinButtonText = `AUTO (${autoSpinsRemaining > 0 ? autoSpinsRemaining : '∞'})`; spinButtonDisabled = true; } else if (isSpinning) { spinButtonText = 'SPINNING'; spinButtonDisabled = true; } else if (!canAfford) { spinButtonText = 'NO FUNDS'; spinButtonDisabled = true; if (isAutoSpinning) { stopAutoSpin(); } } spinButton.disabled = spinButtonDisabled; spinButton.textContent = spinButtonText; const disableAuto = isSpinning || isAutoSpinning || isInBonusRound || !canAfford || bonusRoundEndedButNotReset; autoSpinOptionsContainer.querySelectorAll('button').forEach(btn => btn.disabled = disableAuto); const showAutoOptions = !isAutoSpinning && !isInBonusRound && !bonusRoundEndedButNotReset; autoSpinOptionsContainer.classList.toggle('visually-hidden', !showAutoOptions); stopAutoSpinButton.classList.toggle('visually-hidden', !isAutoSpinning || isInBonusRound || bonusRoundEndedButNotReset); const disableOtherControls = isSpinning || isAutoSpinning; resetButton.disabled = disableOtherControls; unlockRtpButton.disabled = disableOtherControls || rtpUnlocked || isInBonusRound || bonusRoundEndedButNotReset; lockRtpButton.disabled = disableOtherControls || !rtpUnlocked || isInBonusRound || bonusRoundEndedButNotReset; instructionsButton.disabled = disableOtherControls; speedControlButton.disabled = disableOtherControls; hideSpeedButton.disabled = disableOtherControls; betInput.disabled = disableOtherControls || isInBonusRound || bonusRoundEndedButNotReset; rtpSettingInput.disabled = disableOtherControls || !rtpUnlocked || isInBonusRound || bonusRoundEndedButNotReset; rtpSettingInput.style.opacity = rtpSettingInput.disabled ? 0.5 : 1; speedSlider.disabled = disableOtherControls; speedSlider.style.opacity = speedSlider.disabled ? 0.5 : 1; }
+
+        // --- Reel Spinning/Stopping Visuals ---
+        function spinReelColumn(reelIndex) { const reelStrip = reelStrips[reelIndex]; if (!reelStrip) return; let currentTop = parseFloat(reelStrip.style.top) || 0; const totalStripHeight = reelStrip.children.length * CELL_HEIGHT; const speed = getAnimationSpeed(); const intervalDuration = SPIN_INTERVAL_TIME / speed; reelSpinIntervals[reelIndex] = setInterval(() => { currentTop -= (35 * speed); const wrapPoint = -(totalStripHeight - (NUM_ROWS + EXTRA_SYMBOLS) * CELL_HEIGHT); if (currentTop <= wrapPoint) { currentTop += (totalStripHeight - (NUM_ROWS + EXTRA_SYMBOLS) * CELL_HEIGHT); } reelStrip.style.transition = 'none'; reelStrip.style.top = `${currentTop}px`; }, intervalDuration); }
+        function stopReelColumn(reelIndex, finalSymbolsForReel) { if (reelSpinIntervals[reelIndex]) { clearInterval(reelSpinIntervals[reelIndex]); reelSpinIntervals[reelIndex] = null; } const reelStrip = reelStrips[reelIndex]; if (!reelStrip) return; const totalSymbols = reelStrip.children.length; const speed = getAnimationSpeed(); const effectiveBounceDuration = BOUNCE_DURATION / speed; for (let i = 0; i < totalSymbols; i++) { const cell = reelStrip.children[i]; const img = cell.querySelector('img'); let symbolData; const visibleRowIndex = i - EXTRA_SYMBOLS; if (visibleRowIndex >= 0 && visibleRowIndex < NUM_ROWS) { symbolData = finalSymbolsForReel[visibleRowIndex]; cellElements[visibleRowIndex][reelIndex] = cell; } else { symbolData = getRandomPokemon(); } if (symbolData && img) { img.src = symbolData.url; img.alt = symbolData.name; img.dataset.pokemonName = symbolData.name; img.dataset.pokemonTier = symbolData.tier; } else { console.warn(`Missing symbol/img reel ${reelIndex}, strip ${i}`); } } const finalTop = -(EXTRA_SYMBOLS * CELL_HEIGHT); const overshootTop = finalTop - BOUNCE_AMOUNT; reelStrip.style.transition = `top ${effectiveBounceDuration}ms cubic-bezier(0.25, 1, 0.5, 1)`; reelStrip.style.top = `${overshootTop}px`; setTimeout(() => { reelStrip.style.transition = `top ${effectiveBounceDuration * 1.5}ms cubic-bezier(0.175, 0.885, 0.32, 1.275)`; reelStrip.style.top = `${finalTop}px`; }, effectiveBounceDuration); }
+
+        // --- Win Checking ---
+        function checkWin() { currentWin = 0; currentWinningLines = []; let winningCellsCoordsSet = new Set(); let winMessages = []; const effectiveRTP = getEffectiveRTPMultiplier(); clearEffectHighlights(); paylines.forEach((line, lineIndex) => { const firstSymbolCoords = line[0]; const firstSymbolData = finalGridSymbols[firstSymbolCoords[0]]?.[firstSymbolCoords[1]]; if (!firstSymbolData) { return; } let consecutiveSymbols = 1; let currentLineWinningCellsCoords = [firstSymbolCoords]; for (let i = 1; i < line.length; i++) { const currentCoords = line[i]; const currentSymbolData = finalGridSymbols[currentCoords[0]]?.[currentCoords[1]]; if (currentSymbolData && currentSymbolData.name === firstSymbolData.name) { consecutiveSymbols++; currentLineWinningCellsCoords.push(currentCoords); } else { break; } } if (consecutiveSymbols >= 3) { const tier = firstSymbolData.tier; const multiplier = basePayouts[tier]?.[consecutiveSymbols] || 0; if (multiplier > 0) { let winAmount = currentBet * multiplier * effectiveRTP; if (isNaN(winAmount)) { console.error("NaN winAmount!", { currentBet, multiplier, effectiveRTP }); winAmount = 0; } if (winAmount > 0) { currentWin += winAmount; let isHotStreakWin = !isInBonusRound && !bonusRoundEndedButNotReset && consecutiveWins >= HOT_STREAK_THRESHOLD; currentWinningLines.push({ lineCoords: currentLineWinningCellsCoords, symbol: firstSymbolData, consecutive: consecutiveSymbols, amount: winAmount, lineIndex: lineIndex }); currentLineWinningCellsCoords.forEach(coord => winningCellsCoordsSet.add(JSON.stringify(coord))); winMessages.push(`${consecutiveSymbols}x ${firstSymbolData.name}${isHotStreakWin ? '🔥' : ''}`); } } } }); if (isNaN(currentWin)) { console.error("Total currentWin is NaN!"); currentWin = 0; } if (!isNaN(balance)) { balance += currentWin; } else { console.error("Balance is NaN!"); } const winningCellsCoords = Array.from(winningCellsCoordsSet).map(JSON.parse); let bonusTriggered = false; if (currentWin > 0) { consecutiveWins++; applyWinEffect(winningCellsCoords, currentWinningLines); resultDisplay.innerHTML = `WIN! ${CURRENCY_SYMBOL}${formatCurrency(currentWin)} (${[...new Set(winMessages)].join(', ')})`; resultDisplay.className = 'result win'; if (!isInBonusRound && !bonusRoundEndedButNotReset && consecutiveWins >= HOT_STREAK_THRESHOLD) { resultDisplay.classList.add('hot-streak'); } if (!isInBonusRound && !bonusRoundEndedButNotReset) { winsForBonusCounter++; if (winsForBonusCounter >= WINS_NEEDED_FOR_BONUS) { bonusTriggered = true; winsForBonusCounter = 0; showWhosThatPokemonAnimation().then(() => { finishSpin(bonusTriggered); }); return; } } updatePokeballDisplay(); } else { consecutiveWins = 0; checkNearMisses(); if (currentNearMissLines.length === 0) { resultDisplay.textContent = (isInBonusRound || bonusRoundEndedButNotReset) ? 'Bonus Spin - No Match!' : 'Try Again!'; resultDisplay.className = 'result lose'; } updatePokeballDisplay(); } if (!bonusTriggered) { finishSpin(false); } }
+
+        // --- Near Miss Logic ---
+        function checkNearMisses() { currentNearMissLines = []; const nearMissCoordsSet = new Set(); paylines.forEach((line, lineIndex) => { const coord0 = line.find(c => c[1] === 0); const coord1 = line.find(c => c[1] === 1); const coord2 = line.find(c => c[1] === 2); if (!coord0 || !coord1 || !coord2) return; const symbol0 = finalGridSymbols[coord0[0]]?.[coord0[1]]; const symbol1 = finalGridSymbols[coord1[0]]?.[coord1[1]]; const symbol2 = finalGridSymbols[coord2[0]]?.[coord2[1]]; if (symbol0 && symbol1 && symbol0.name === symbol1.name && (!symbol2 || symbol2.name !== symbol0.name)) { const nearMissData = { lineCoords: [coord0, coord1, coord2], missedCoord: coord2, lineIndex: lineIndex }; currentNearMissLines.push(nearMissData); nearMissCoordsSet.add(JSON.stringify(coord2)); } }); if (nearMissCoordsSet.size > 0) { applyNearMissEffect(Array.from(nearMissCoordsSet).map(JSON.parse), currentNearMissLines); } }
+        function applyNearMissEffect(nearMissHighlightCoords, nearMissLineData) { clearEffectHighlights(); nearMissHighlightCoords.forEach(coord => { const cellElement = cellElements[coord[0]]?.[coord[1]]; if (cellElement) { cellElement.classList.add('near-miss-cell'); } }); drawNearMissLines(nearMissLineData); const messages = ["Nearly!", "So Close!", "Almost!", "One Away!"]; resultDisplay.textContent = messages[Math.floor(Math.random() * messages.length)]; resultDisplay.className = 'result near-miss-text'; clearTimeout(nearMissHighlightTimeout); nearMissHighlightTimeout = setTimeout(clearEffectHighlights, NEAR_MISS_DURATION / getAnimationSpeed()); }
+
+        // --- WTP Animation ---
+        function showWhosThatPokemonAnimation() { return new Promise(resolve => { clearTimeout(wtpAnimationTimeout ? wtpAnimationTimeout[0] : null); clearTimeout(wtpAnimationTimeout ? wtpAnimationTimeout[1] : null); const speed = getAnimationSpeed(); const effectiveRevealDelay = WTP_REVEAL_DELAY / speed; const effectiveTotalDuration = WTP_TOTAL_DURATION / speed; const randomLegendary = wtpCandidates[Math.floor(Math.random() * wtpCandidates.length)]; wtpNameSpan.textContent = randomLegendary.name; wtpShadowImg.src = randomLegendary.url; wtpRevealedImg.src = randomLegendary.url; wtpBonusSpinsP.innerHTML = `🎁 Awarded <span class="bonus-details">${BONUS_SPINS_GRANTED} Free Spins!</span>`; wtpBonusRtpP.innerHTML = `💰 Featuring legendary Pokémon and a massive <span class="bonus-details">${BONUS_RTP_MULTIPLIER}x win multiplier!</span>`; wtpContent.classList.remove('revealed'); wtpInfoDiv.style.opacity = '0'; wtpInfoDiv.style.transform = 'translateY(15px)'; wtpOverlay.classList.remove('hidden'); const revealTimeout = setTimeout(() => { wtpContent.classList.add('revealed'); }, effectiveRevealDelay); const hideTimeout = setTimeout(() => { wtpOverlay.classList.add('hidden'); resolve(); wtpAnimationTimeout = null; }, effectiveTotalDuration); wtpAnimationTimeout = [revealTimeout, hideTimeout]; }); }
+
+        // --- Finish Spin & State Management ---
+        function finishSpin(bonusJustTriggered) { isSpinning = false; updateDisplays(); if (bonusJustTriggered) { startBonusRound(); return; } if (isInBonusRound && bonusSpinsRemaining <= 0) { endBonusRound(); return; } checkBalanceForSpin(); if (isAutoSpinning) { autoSpinsRemaining = (autoSpinsRemaining > 0) ? autoSpinsRemaining - 1 : -1; const canContinue = (autoSpinsRemaining >= 0 || autoSpinsRemaining === -1); const hasFundsOrBonus = (isInBonusRound && bonusSpinsRemaining > 0) || (!isInBonusRound && balance >= currentBet); if (canContinue && hasFundsOrBonus) { clearTimeout(autoSpinTimeout); autoSpinTimeout = setTimeout(spin, AUTO_SPIN_DELAY / getAnimationSpeed()); } else { stopAutoSpin(); checkBalanceForSpin(); } } else if (!isInBonusRound && !bonusRoundEndedButNotReset) { enableControls(); checkBalanceForSpin(); } }
+
+        // --- Clear Effects ---
+        function clearEffectHighlights() { clearTimeout(nearMissHighlightTimeout); nearMissHighlightTimeout = null; clearTimeout(winHighlightTimeout); winHighlightTimeout = null; if (cellElements && cellElements.length > 0) { cellElements.forEach(row => { if (row) row.forEach(cell => { if (cell) { cell.classList.remove('near-miss-cell', 'winning-cell'); } }) }); } if (slotMachineBody) slotMachineBody.classList.remove('win-glow'); if (cornerLights) cornerLights.forEach(light => light.classList.remove('flashing')); if (slotMachineBody) { slotMachineBody.style.removeProperty('--current-win-glow-color'); slotMachineBody.style.removeProperty('--current-cell-win-highlight'); slotMachineBody.style.removeProperty('--current-win-color'); } clearWinLines(); }
+
+        // --- Apply Win Effects ---
+        function applyWinEffect(winningCoords, winningLineData) { if (!winningCoords || winningCoords.length === 0) return; clearEffectHighlights(); const glowColor = (isInBonusRound || bonusRoundEndedButNotReset) ? 'var(--bonus-win-glow-color)' : 'var(--win-glow-color)'; const cellHighlight = (isInBonusRound || bonusRoundEndedButNotReset) ? 'var(--bonus-cell-win-highlight)' : 'var(--cell-win-highlight)'; const winColorVar = (isInBonusRound || bonusRoundEndedButNotReset) ? 'var(--bonus-display-text)' : 'var(--win-color)'; slotMachineBody.style.setProperty('--current-win-glow-color', glowColor); slotMachineBody.style.setProperty('--current-cell-win-highlight', cellHighlight); slotMachineBody.style.setProperty('--current-win-color', winColorVar); slotMachineBody.classList.add('win-glow'); cornerLights.forEach(light => light.classList.add('flashing')); winningCoords.forEach(coord => { const cellElement = cellElements[coord[0]]?.[coord[1]]; if (cellElement) { cellElement.classList.add('winning-cell'); } }); drawWinLines(winningLineData); const speed = getAnimationSpeed(); const duration = (isInBonusRound || bonusRoundEndedButNotReset) ? WIN_HIGHLIGHT_DURATION : Math.min(WIN_HIGHLIGHT_DURATION, WTP_TOTAL_DURATION - 500); const effectiveDuration = duration / speed; clearTimeout(winHighlightTimeout); winHighlightTimeout = setTimeout(clearEffectHighlights, effectiveDuration); }
+
+        // --- Canvas Drawing ---
+        function clearWinLines() { if(winLinesCanvas && winLinesContext) winLinesContext.clearRect(0, 0, winLinesCanvas.width * (window.devicePixelRatio || 1), winLinesCanvas.height * (window.devicePixelRatio || 1)); }
+        function getCellCenter(row, reel) { const cellX = REELS_PADDING + reel * (CELL_WIDTH + REEL_GAP) + (CELL_WIDTH / 2); const cellY = REELS_PADDING + row * CELL_HEIGHT + (CELL_HEIGHT / 2); return { x: cellX, y: cellY }; }
+        function drawWinLines(winningLineData) { clearWinLines(); if (!winningLineData || winningLineData.length === 0 || !winLinesContext) return; const scale = window.devicePixelRatio || 1; winLinesContext.lineWidth = 5 * scale; winLinesContext.lineCap = 'round'; winLinesContext.lineJoin = 'round'; winLinesContext.strokeStyle = (isInBonusRound || bonusRoundEndedButNotReset) ? getComputedStyle(document.documentElement).getPropertyValue('--bonus-win-line-color').trim() : getComputedStyle(document.documentElement).getPropertyValue('--win-line-color').trim(); winLinesContext.shadowColor = 'rgba(0, 0, 0, 0.5)'; winLinesContext.shadowBlur = 5 * scale; winLinesContext.shadowOffsetX = 1 * scale; winLinesContext.shadowOffsetY = 1 * scale; winLinesContext.setLineDash([]); winningLineData.forEach(lineData => { winLinesContext.beginPath(); lineData.lineCoords.forEach((coord, index) => { const center = getCellCenter(coord[0], coord[1]); if (index === 0) { winLinesContext.moveTo(center.x * scale, center.y * scale); } else { winLinesContext.lineTo(center.x * scale, center.y * scale); } }); winLinesContext.stroke(); }); winLinesContext.shadowColor = 'transparent'; winLinesContext.shadowBlur = 0; winLinesContext.shadowOffsetX = 0; winLinesContext.shadowOffsetY = 0; }
+        function drawNearMissLines(nearMissLineData) { if (!nearMissLineData || nearMissLineData.length === 0 || !winLinesContext) return; const scale = window.devicePixelRatio || 1; winLinesContext.lineWidth = 3 * scale; winLinesContext.lineCap = 'round'; winLinesContext.lineJoin = 'round'; winLinesContext.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--near-miss-line-color').trim(); winLinesContext.shadowColor = 'rgba(0, 0, 0, 0.4)'; winLinesContext.shadowBlur = 3 * scale; winLinesContext.shadowOffsetX = 1 * scale; winLinesContext.shadowOffsetY = 1 * scale; winLinesContext.setLineDash([]); nearMissLineData.forEach(lineData => { winLinesContext.beginPath(); for(let i = 0; i < lineData.lineCoords.length; i++) { const coord = lineData.lineCoords[i]; const center = getCellCenter(coord[0], coord[1]); if (i === 0) { winLinesContext.moveTo(center.x * scale, center.y * scale); } else { winLinesContext.lineTo(center.x * scale, center.y * scale); } } winLinesContext.stroke(); }); winLinesContext.shadowColor = 'transparent'; winLinesContext.shadowBlur = 0; winLinesContext.shadowOffsetX = 0; winLinesContext.shadowOffsetY = 0; }
+
+        // --- Bonus Round Logic ---
+        function resetBonusState() { isInBonusRound = false; bonusRoundEndedButNotReset = false; bonusSpinsRemaining = 0; winsForBonusCounter = 0; consecutiveWins = 0; slotMachineBody.classList.remove('bonus-mode'); updateDisplays(); updatePokeballDisplay(); }
+        function startBonusRound() { if (isInBonusRound) return; console.log("BONUS ROUND STARTED!"); clearEffectHighlights(); consecutiveWins = 0; resultDisplay.textContent = `BONUS ROUND! ${BONUS_SPINS_GRANTED} Free Spins!`; resultDisplay.className = 'result bonus-trigger'; isInBonusRound = true; bonusRoundEndedButNotReset = false; bonusSpinsRemaining = BONUS_SPINS_GRANTED; if (isAutoSpinning) { stopAutoSpin(false); } slotMachineBody.classList.add('bonus-mode'); createGrid(); disableControls(); updateDisplays(); checkBalanceForSpin(); setTimeout(() => { resultDisplay.textContent = `Bonus Spin ${BONUS_SPINS_GRANTED - bonusSpinsRemaining + 1}/${BONUS_SPINS_GRANTED}...`; resultDisplay.className = 'result'; spin(); }, 1000 / getAnimationSpeed()); }
+        function endBonusRound() { if (!isInBonusRound) return; console.log("BONUS ROUND ENDED (Visuals remain)"); clearEffectHighlights(); resultDisplay.textContent = 'Bonus Complete! Spin to continue...'; resultDisplay.className = 'result'; isInBonusRound = false; bonusRoundEndedButNotReset = true; updateDisplays(); enableControls(); checkBalanceForSpin(); }
+        function performBonusReset() { console.log("Performing delayed bonus reset."); bonusRoundEndedButNotReset = false; slotMachineBody.classList.remove('bonus-mode'); createGrid(); resetBonusState(); checkBalanceForSpin(); }
+
+        // --- Auto-Spin Logic ---
+        function startAutoSpin(count) { if (isSpinning || isAutoSpinning || isInBonusRound || bonusRoundEndedButNotReset || balance < currentBet || spinButton.disabled) { checkBalanceForSpin(); return; } isAutoSpinning = true; autoSpinsRemaining = count; console.log(`Starting auto-spin for ${count === -1 ? 'unlimited' : count} spins.`); disableControls(); checkBalanceForSpin(); spin(); }
+        function stopAutoSpin(enableCtrls = true) { if (!isAutoSpinning) return; console.log("Stopping auto-spin."); isAutoSpinning = false; autoSpinsRemaining = 0; clearTimeout(autoSpinTimeout); autoSpinTimeout = null; if (enableCtrls && !isSpinning && !isInBonusRound && !bonusRoundEndedButNotReset) { enableControls(); } checkBalanceForSpin(); }
+
+        // --- Control Enabling/Disabling ---
+        function disableControls() { betInput.disabled = true; rtpSettingInput.disabled = true; rtpSettingInput.style.opacity = 0.5; speedSlider.disabled = true; speedSlider.style.opacity = 0.5; unlockRtpButton.disabled = true; lockRtpButton.disabled = true; instructionsButton.disabled = true; speedControlButton.disabled = true; hideSpeedButton.disabled = true; autoSpinOptionsContainer.querySelectorAll('button').forEach(btn => btn.disabled = true); resetButton.disabled = true; }
+        function enableControls() { if (isSpinning || (isInBonusRound && !bonusRoundEndedButNotReset)) return; betInput.disabled = bonusRoundEndedButNotReset; rtpSettingInput.disabled = !rtpUnlocked || bonusRoundEndedButNotReset; rtpSettingInput.style.opacity = (!rtpUnlocked || bonusRoundEndedButNotReset) ? 0.5 : 1; speedSlider.disabled = false; speedSlider.style.opacity = 1; unlockRtpButton.disabled = rtpUnlocked || bonusRoundEndedButNotReset; lockRtpButton.disabled = !rtpUnlocked || bonusRoundEndedButNotReset; instructionsButton.disabled = false; speedControlButton.disabled = false; hideSpeedButton.disabled = false; autoSpinOptionsContainer.querySelectorAll('button').forEach(btn => btn.disabled = bonusRoundEndedButNotReset); resetButton.disabled = false; }
+
+        // --- Main Spin Function ---
+        function spin() {
+             if (isSpinning) { console.log("Already spinning."); return; }
+             if (bonusRoundEndedButNotReset) { performBonusReset(); }
+             let cost = currentBet; let isBonusSpin = false; clearEffectHighlights(); currentWin = 0; currentWinningLines = []; currentNearMissLines = []; winDisplay.textContent = formatCurrency(0); resultDisplay.className = 'result';
+             if (isInBonusRound) { if (bonusSpinsRemaining <= 0) { endBonusRound(); return; } cost = 0; isBonusSpin = true; bonusSpinsRemaining--; resultDisplay.textContent = `Bonus Spin (${BONUS_SPINS_GRANTED - bonusSpinsRemaining}/${BONUS_SPINS_GRANTED})...`; }
+             else { if (balance < currentBet) { console.log("Insufficient funds."); resultDisplay.textContent = 'Not enough PokéCoins!'; resultDisplay.className = 'result lose'; checkBalanceForSpin(); if (isAutoSpinning) stopAutoSpin(); return; } balance -= cost; resultDisplay.textContent = 'Spinning...'; }
+             isSpinning = true; disableControls(); updateDisplays(); checkBalanceForSpin(); finalGridSymbols = []; for (let r = 0; r < NUM_ROWS; r++) finalGridSymbols[r] = []; const symbolsAvailable = getSymbolsForCurrentRound();
+             for (let reel = 0; reel < NUM_REELS; reel++) { let availableForColumn = [...symbolsAvailable]; for (let row = 0; row < NUM_ROWS; row++) { if (availableForColumn.length === 0) { console.warn(`Ran out of unique symbols for reel ${reel}`); availableForColumn = [...symbolsAvailable]; } const randomIndex = Math.floor(Math.random() * availableForColumn.length); finalGridSymbols[row][reel] = availableForColumn.splice(randomIndex, 1)[0]; } spinReelColumn(reel); }
+             let totalSpinTime = SPIN_DURATION_BASE / getAnimationSpeed(); reelStopTimers.forEach(timer => clearTimeout(timer)); reelStopTimers = [];
+             for (let reel = 0; reel < NUM_REELS; reel++) { const effectiveStopDelay = (SPIN_DURATION_BASE + reel * REEL_STOP_DELAY_INCREMENT) / getAnimationSpeed(); reelStopTimers.push(setTimeout(() => { const finalSymbolsForColumn = finalGridSymbols.map(rowSymbols => rowSymbols[reel]); stopReelColumn(reel, finalSymbolsForColumn); }, effectiveStopDelay)); totalSpinTime = effectiveStopDelay; }
+             const checkDelay = totalSpinTime + (BOUNCE_DURATION * 1.6 / getAnimationSpeed()) + 50; reelStopTimers.push(setTimeout(checkWin, checkDelay));
+         }
+
+        // --- Instructions Modal Logic ---
+         function generatePayoutTable() { let tableHTML = `<table class="payout-table"><thead><tr><th>Pokémon (Tier)</th><th>Match 3</th><th>Match 4</th><th>Match 5</th></tr></thead><tbody>`; tableHTML += `<tr><th colspan="4">Standard Round Payouts</th></tr>`; const standardTiers = {}; pokemonGen1Starters.forEach(p => { if (!standardTiers[p.tier]) standardTiers[p.tier] = []; standardTiers[p.tier].push(p); }); Object.keys(standardTiers).sort((a, b) => parseInt(a) - parseInt(b)).forEach(tier => { standardTiers[tier].sort((a, b) => a.name.localeCompare(b.name)); standardTiers[tier].forEach(p => { const payoutInfo = basePayouts[p.tier] || {}; tableHTML += `<tr><td class="poke-cell"><img src="${p.url}" alt="${p.name}"><div><span class="poke-name">${p.name}</span><span class="poke-tier">(Tier ${p.tier})</span></div></td><td><span class="payout-multiplier">${payoutInfo[3] ? payoutInfo[3] + 'x' : '-'}</span></td><td><span class="payout-multiplier">${payoutInfo[4] ? payoutInfo[4] + 'x' : '-'}</span></td><td><span class="payout-multiplier">${payoutInfo[5] ? payoutInfo[5] + 'x' : '-'}</span></td></tr>`; }); }); tableHTML += `<tr><th colspan="4" style="padding-top: 15px;">Bonus Round Payouts</th></tr>`; const bonusTiers = {}; pokemonLegendaries.forEach(p => { if (!bonusTiers[p.tier]) bonusTiers[p.tier] = []; bonusTiers[p.tier].push(p); }); Object.keys(bonusTiers).sort((a, b) => parseInt(a) - parseInt(b)).forEach(tier => { bonusTiers[tier].sort((a, b) => a.name.localeCompare(b.name)); bonusTiers[tier].forEach(p => { const payoutInfo = basePayouts[p.tier] || {}; tableHTML += `<tr><td class="poke-cell"><img src="${p.url}" alt="${p.name}"><div><span class="poke-name">${p.name}</span><span class="poke-tier">(Tier ${p.tier})</span></div></td><td><span class="payout-multiplier">${payoutInfo[3] ? payoutInfo[3] + 'x' : '-'}</span></td><td><span class="payout-multiplier">${payoutInfo[4] ? payoutInfo[4] + 'x' : '-'}</span></td><td><span class="payout-multiplier">${payoutInfo[5] ? payoutInfo[5] + 'x' : '-'}</span></td></tr>`; }); }); tableHTML += `</tbody></table>`; payoutTableContainer.innerHTML = tableHTML; document.getElementById('instructions-how-to-play').innerHTML = `Select your bet (${CURRENCY_SYMBOL}${MIN_BET}-${CURRENCY_SYMBOL}${MAX_BET}) & SPIN! Match 3+ Pokémon on a payline L-to-R to win.`; document.getElementById('instructions-paylines').innerHTML = `Wins awarded on ${paylines.length} fixed patterns (paylines).`; document.getElementById('instructions-bonus').innerHTML = `Get <strong class="bonus-details">${WINS_NEEDED_FOR_BONUS} wins</strong> (Pokéballs) for Bonus Round: <strong class="bonus-details">${BONUS_SPINS_GRANTED} Free Spins</strong> with legendary Pokémon & <strong class="bonus-details">${BONUS_RTP_MULTIPLIER}x win multiplier</strong>!`; }
+         instructionsButton.addEventListener('click', () => { generatePayoutTable(); instructionsOverlay.classList.remove('hidden'); });
+         instructionsCloseButton.addEventListener('click', () => { instructionsOverlay.classList.add('hidden'); });
+         instructionsOverlay.addEventListener('click', (e) => { if (e.target === instructionsOverlay) { instructionsOverlay.classList.add('hidden'); } });
+
+        // --- Event Listeners ---
+        spinButton.addEventListener('click', () => { if (!isAutoSpinning && !isSpinning) { spin(); } });
+        autoSpinOptionsContainer.addEventListener('click', (e) => { if (e.target.tagName === 'BUTTON' && e.target.dataset.spins) { startAutoSpin(parseInt(e.target.dataset.spins, 10)); } });
+        stopAutoSpinButton.addEventListener('click', () => stopAutoSpin());
+        resetButton.addEventListener('click', () => { if (isSpinning) return; if (!confirm("Are you sure you want to reset the game?")) { return; } stopAutoSpin(false); reelSpinIntervals.forEach(interval => clearInterval(interval)); reelSpinIntervals = []; reelStopTimers.forEach(timer => clearTimeout(timer)); reelStopTimers = []; clearTimeout(winHighlightTimeout); clearTimeout(autoSpinTimeout); clearTimeout(nearMissHighlightTimeout); if(wtpAnimationTimeout) { clearTimeout(wtpAnimationTimeout[0]); clearTimeout(wtpAnimationTimeout[1]); wtpAnimationTimeout = null; } wtpOverlay.classList.add('hidden'); passwordPromptOverlay.classList.add('hidden'); instructionsOverlay.classList.add('hidden'); speedControlContainer.classList.add('hidden'); rtpControlContainer.classList.add('hidden'); clearEffectHighlights(); clearWinLines(); isSpinning = false; balance = 0; currentWin = 0; currentBet = DEFAULT_BET; currentRTP = 100; rtpUnlocked = false; animationSpeedMultiplier = 1.0; resetBonusState(); gameContainer.classList.add('hidden'); preScreen.classList.remove('hidden'); startMoneyInput.value = 1000; startError.textContent = ''; resultDisplay.textContent = 'Game Reset. Enter balance.'; resultDisplay.className = 'result'; betInput.value = formatCurrency(currentBet); rtpSettingInput.value = currentRTP; speedSlider.value = 100; reelsGridElement.innerHTML = ''; reelStrips = []; finalGridSymbols = []; cellElements = []; updateDisplays(); });
+        window.addEventListener('resize', resizeWinCanvas);
+
+        // --- Initial State Setup ---
+        function initializeGame() { currentBet = DEFAULT_BET; betInput.value = formatCurrency(currentBet); currentRTP = 100; rtpSettingInput.value = currentRTP; rtpUnlocked = false; animationSpeedMultiplier = 1.0; speedSlider.value = 100; resetBonusState(); isSpinning = false; consecutiveWins = 0; stopAutoSpin(false); updateDisplays(); enableControls(); checkBalanceForSpin(); resizeWinCanvas(); resultDisplay.textContent = 'Good Luck!'; resultDisplay.className = 'result'; wtpOverlay.classList.add('hidden'); passwordPromptOverlay.classList.add('hidden'); instructionsOverlay.classList.add('hidden'); speedControlContainer.classList.add('hidden'); rtpControlContainer.classList.add('hidden'); }
+        const startButtonHandler = () => { if (!preScreen || !gameContainer || !startMoneyInput || !startError) { console.error("Required start elements not found!"); return; } const startAmount = parseFloat(startMoneyInput.value); startError.textContent = ''; if (isNaN(startAmount) || startAmount < MIN_BET) { startError.textContent = `Please enter at least ${CURRENCY_SYMBOL}${MIN_BET}.`; return; } balance = startAmount; preScreen.classList.add('hidden'); gameContainer.classList.remove('hidden'); createGrid(); initializeGame(); };
+        document.addEventListener('DOMContentLoaded', () => {
+            betInput.value = formatCurrency(DEFAULT_BET); betInput.min = MIN_BET; betInput.max = MAX_BET; betInput.step = BET_STEP;
+            rtpSettingInput.value = currentRTP; rtpSettingInput.min = 0; rtpSettingInput.max = 500; rtpSettingInput.step = 1;
+            speedSlider.value = animationSpeedMultiplier * 100; speedSlider.min = 100; speedSlider.max = 200; speedSlider.step = 10;
+            rtpUnlocked = false; bonusPlaceholderText.textContent = 'Standard Round'; updateDisplays(); checkBalanceForSpin();
+            wtpOverlay.classList.add('hidden'); passwordPromptOverlay.classList.add('hidden'); instructionsOverlay.classList.add('hidden'); rtpControlContainer.classList.add('hidden'); speedControlContainer.classList.add('hidden');
+            generatePayoutTable();
+            if (startButton) { startButton.addEventListener('click', startButtonHandler); }
+            else { console.error("Start button not found on DOMContentLoaded!"); }
+        });
+
+    </script>
+</body>
+</html>
